@@ -35,6 +35,7 @@ def get_tax(acc):
     r = requests.get(url, params=payload)
 
     cont = r.text
+    print(cont)
     # Extract lines containing taxonomic information
     hits = re.finditer(("OC\s+(.*)"), cont)
     tax = []
@@ -96,6 +97,7 @@ def main():
     accs = get_accs(in_file)
     results = {}
     for num, acc in enumerate(accs):
+        print(f"{acc = }")
         tax = get_tax(acc)
         results[acc] = get_tax(acc)
 
@@ -106,4 +108,5 @@ def main():
     show_results(results)
     output_results(results)    
 
-main()
+if __name__ == "__main__":
+    main()
