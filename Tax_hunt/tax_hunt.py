@@ -3,7 +3,9 @@ import re
 import pandas as pd
 
 # Declare globals
-in_file = "./in_files/hhblits_ScAtg23.out"
+in_file = "./in_files/Ant Atg28.out"
+# in_file = "./in_files/hhblits_ScAtg23_new.out"
+
 out_file = "./out_files/out_file.xlsx"
 url = "http://www.uniprot.org/uniprot/"
 
@@ -14,8 +16,7 @@ def extract_acc(line):
         Args:
             line (str)
     """
-
-    acc = re.search(("tr\|(\w+)\|"), line).group(1)
+    acc = re.search(("UniRef100_(\w+)"), line).group(1)
     return acc
 
 def get_tax(acc):
@@ -55,13 +56,20 @@ def get_accs(file_):
     """
 
     with open(file_, "r") as ori_file:
-        master_file = ori_file.read()
+        master_lines = ori_file.readlines()
+
+    accs = []
 
     # Extract summary lines
-    lines = re.finditer(("\d+\s+tr\|.*"), master_file)
-    accs = []
-    for line in lines:
-        accs.append(extract_acc(str(line)))
+    i = 0
+    while "No Hit" not in master_lines[i]:
+        i += 1
+
+    for line in master_lines[i+1:]:
+        if "UniRef100" not in line:
+            break
+    
+        accs.append(extract_acc(line))
 
     return accs
 
@@ -96,6 +104,7 @@ def main():
     accs = get_accs(in_file)
     results = {}
     for num, acc in enumerate(accs):
+        print("acc =", acc)
         tax = get_tax(acc)
         results[acc] = get_tax(acc)
 
